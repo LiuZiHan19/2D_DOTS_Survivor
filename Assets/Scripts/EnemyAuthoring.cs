@@ -12,6 +12,7 @@ public class EnemyAuthoring : MonoBehaviour
 {
     public int AttackDamage;
     public float CooldownTime;
+    public GameObject GemPrefab;
 
     public class Baker : Baker<EnemyAuthoring>
     {
@@ -19,13 +20,20 @@ public class EnemyAuthoring : MonoBehaviour
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
             AddComponent(entity, new EnemyTag());
+
             AddComponent(entity, new EnemyAttackData()
             {
                 HitPoints = authoring.AttackDamage,
                 CooldownTime = authoring.CooldownTime
             });
+
             AddComponent(entity, new EnemyCooldownExpirationTimestamp());
             SetComponentEnabled<EnemyCooldownExpirationTimestamp>(entity, false);
+
+            AddComponent(entity, new GemPrefab()
+            {
+                Value = GetEntity(authoring.GemPrefab, TransformUsageFlags.Dynamic)
+            });
         }
     }
 }
@@ -34,7 +42,7 @@ public struct EnemyTag : IComponentData
 {
 }
 
-#region Move To Player
+#region Move to player
 
 public partial struct EnemyMoveToPlayerSystem : ISystem
 {
@@ -176,3 +184,8 @@ public struct EnemyAttackJob1 : ICollisionEventsJob
 }
 
 #endregion
+
+public struct GemPrefab : IComponentData
+{
+    public Entity Value;
+}
